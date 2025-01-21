@@ -1,5 +1,6 @@
 import pytest
 import helpers
+import api
 
 
 @pytest.fixture
@@ -8,13 +9,13 @@ def user_data():
 
     yield data
 
-    helpers.try_to_delete_user(data)
+    api.try_to_delete_user(data)
 
 
 @pytest.fixture
 def created_user():
     data = helpers.generate_new_user_credentials()
-    helpers.create_user(data)
+    api.new_user(data)
 
     yield data
 
@@ -24,7 +25,7 @@ def created_user():
 @pytest.fixture
 def logged_in_user_credentials():
     credentials = helpers.generate_new_user_credentials()
-    helpers.create_user(credentials, login=True)
+    api.new_user(credentials, login=True)
 
     yield credentials
 
@@ -33,4 +34,4 @@ def logged_in_user_credentials():
 
 @pytest.fixture
 def valid_ingredient_hashes():
-    return helpers.get_available_ingredient_hashes()
+    return api.get_available_ingredient_hashes()

@@ -45,3 +45,45 @@ def get_orders(token):
 @allure.step('Отправляем запрос на получение ингредиентов')
 def get_ingredients():
     return requests.get(url.GET_INGREDIENTS)
+
+
+@allure.step('Авторизация учетными данными')
+def authorization_user(credentials):
+    new_credentials = {
+        'email': credentials['email'],
+        'password': credentials['password']
+    }
+    response = login_user(new_credentials)
+    response_payload = response.json()
+    credentials['accessToken'] = response_payload['accessToken']
+
+
+@allure.step('Создаем нового пользователя')
+def new_user(credentials, login=False):
+    response = create_user(credentials)
+    response_payload = response.json()
+    credentials['accessToken'] = response_payload['accessToken']
+
+    if login:
+        authorization_user(credentials)
+    return credentials
+
+
+@allure.step('Удаление пользователя')
+def try_to_delete_user(credentials):
+    response = login_user(credentials)
+    if response.status_code == 200 and 'accessToken' in response.json():
+        delete_user(response.json()['accessToken'])
+
+
+@allure.step('Получаем список ингредиентов')
+def get_available_ingredient_hashes(limit=2):
+    response = get_ingredients()
+    objects = response.json()['data']
+
+    hashes = []
+    for obj in objects:
+        hashes.append(obj['_id'])
+        if len(hashes) >= limit:
+            break
+    return hashes

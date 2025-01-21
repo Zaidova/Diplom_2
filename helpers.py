@@ -36,43 +36,5 @@ def generate_new_user_credentials(empty_field=None):
     return credentials
 
 
-def login_user(credentials):
-    new_credentials = {
-        'email': credentials['email'],
-        'password': credentials['password']
-    }
-    response = api.login_user(new_credentials)
-    response_payload = response.json()
-    credentials['accessToken'] = response_payload['accessToken']
-
-
-def create_user(credentials, login=False):
-    response = api.create_user(credentials)
-    response_payload = response.json()
-    credentials['accessToken'] = response_payload['accessToken']
-
-    if login:
-        login_user(credentials)
-    return credentials
-
-
 def delete_user(credentials):
     api.delete_user(credentials['accessToken'])
-
-
-def try_to_delete_user(credentials):
-    response = api.login_user(credentials)
-    if response.status_code == 200 and 'accessToken' in response.json():
-        api.delete_user(response.json()['accessToken'])
-
-
-def get_available_ingredient_hashes(limit=2):
-    response = api.get_ingredients()
-    objects = response.json()['data']
-
-    hashes = []
-    for obj in objects:
-        hashes.append(obj['_id'])
-        if len(hashes) >= limit:
-            break
-    return hashes
